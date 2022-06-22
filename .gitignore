@@ -302,3 +302,7 @@ TSWLatexianTemp*
 
 # Mac specific
 .DS_Store
+
+# Ignore executable for testing code
+Cpp/*
+!Cpp/*.cpp
