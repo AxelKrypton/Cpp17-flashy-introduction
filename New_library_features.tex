@@ -6,9 +6,10 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{C++17 new library features I will \textbf{not} cover}
     \begin{tabular}{l}
-        \URL[PB]{https://en.cppreference.com/w/cpp/types/byte}{~std::byte}\\[1mm]
-        \URL[PB]{https://en.cppreference.com/w/cpp/utility/functional/invoke}{~std::invoke}\Remark{More understandable \URL[PB]{https://stackoverflow.com/q/43680182/14967071}{SO question}}\\[1mm]
-        \URL[PB]{https://en.cppreference.com/w/cpp/utility/apply}{~std::apply} $\;\to\;$ {\footnotesize\URL[PB]{https://stackoverflow.com/q/52449163/14967071}{What's the difference with \CPP|std::invoke|\,?}}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/numeric/special_functions}{~Mathematical special functions} (still  \URL[PT]{https://en.cppreference.com/w/cpp/compiler_support/17\#C.2B.2B17_library_features}{GNU compiler only})\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/types/byte}{~\CPP|std::byte|}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/utility/functional/invoke}{~\CPP|std::invoke|}\Remark{More understandable \URL[PB]{https://stackoverflow.com/q/43680182/14967071}{SO question}}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/utility/apply}{~\CPP|std::apply|} $\;\to\;$ {\footnotesize\URL[PB]{https://stackoverflow.com/q/52449163/14967071}{What's the difference with \CPP|std::invoke|\,?}}\\[1mm]
         \URL[PB]{https://wg21.link/P0083R3}{~Splicing maps and sets} \Remark{i.e. effectively transfer elements \`a la \CPP|std::list::splice|}
 
     \end{tabular}
@@ -20,21 +21,122 @@
 %============================================%
 
 %============================================%
+\section{\CPP|std::string\_view|}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    \begin{itemize}
+        \item A \alert{non-owning} reference to a string, it is just a view!
+        \item Useful for providing an abstraction on top of strings \Remark{e.g.\ for parsing}
+        \item There are view modification functions which do not affect viewed string
+        \item \CPP|std::string_view| doesn't use null terminators to mark the end of the string
+        \item \PP{Prefer passing string views by value to constant refs to strings!}\\
+              \then \URL[PB]{https://stackoverflow.com/a/40129198/14967071}{How is it faster?}
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/string/basic_string_view}{C++ reference}
+    \end{itemize}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \begin{varblock}{example}[\textwidth]{Basic usage}<only@1>
+        \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<string>+|
+            #include |+<string_view>+|
+
+            int main()
+            {
+                std::string str {"   trim me"};
+                std::string_view v {str};
+                v.remove_prefix(std::min(
+                                  v.find_first_not_of(" "), v.size()));
+                std::cout << '_' << str << "_\t_" << v << "_\n";
+
+                using namespace std::literals;
+                auto getSV = [](){ // Noooooo! -> view is NOT OWNING!
+                    std::string x = "local";
+                    return std::string_view{x};
+                };
+                std::string_view bad = getSV();
+                std::cout << bad << '\n'; // UNDEFINED BEHAVIOUR
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+_   trim me_	_trim me_
+            p4Ek+|
+        \end{Bash}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
 \section{\CPP|std::variant|}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{\insertsectionhead}
     \vspace{-3mm}
     \begin{itemize}
-        \item More information: \URL[PB]{}{C++ reference}
+        \item A class template that represents a type-safe union
+        \item An instance of \CPP|std::variant| at any given time either holds a value of one of its alternative types, or in the case of error, no value \Remark{generally hard to achieve}
+        \item Assign values at construction or using the \CPP|operator=|
+        \item Retrieve values using the \CPP|std::get<T>()| function
+        \item \alert{Revolution in inheritance patterns (e.g. visitor)}
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/utility/variant}{C++ reference}
     \end{itemize}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{}
-    \begin{varblock}{example}[\textwidth]{}<only@1>
+    \begin{varblock}{example}[\textwidth]{Basic usage (\overlaynumber)}<only@1>
         \begin{Cpp}
+            #include |+<variant>+|
+            #include |+<string>+|
+            #include |+<iostream>+|
+
+            int main()
+            {
+                std::variant<int, float> v, w;
+                v = 42; // v contains int
+                int i = std::get<int>(v);
+                assert(42 == i); // succeeds
+                w = std::get<int>(v);
+                w = std::get<0>(v); // same effect as the previous line
+                w = v;              // same effect as the previous line
+
+                std::variant<std::string, float> v{
+                    std::in_place_type<std::string>, 4, 'A'};
+                // initializes 1st alternative with std::string{4, 'A'};
+                assert(v.index() == 0);
+                std::cout << "v=" << std::get<std::string>(v) << '\n';
+            }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |++|
+            |+v=AAAA+|
+        \end{Bash}
+    \end{varblock}
+    \begin{varblock}{example}[\textwidth]{Basic usage (\overlaynumber)}<only@2>
+        \begin{Cpp}
+            #include |+<variant>+|
+            #include |+<iostream>+|
+
+            int main()
+            {
+                std::variant<int, float> v, w;
+                v = 42;
+                w = v;
+
+                // Errors:
+                //std::get<double>(v); // no double in [int, float]
+                //std::get<3>(v);      // valid index values are 0 and 1
+
+                try {
+                    // w contains int, not float: will throw
+                    std::get<float>(w);
+                }
+                catch (const std::bad_variant_access& e) {
+                    std::cout << e.what() << '\n';
+                }
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+bad_variant_access+|
         \end{Bash}
     \end{varblock}
 \end{frame}
@@ -46,16 +148,67 @@
 \begin{frame}[fragile]{\insertsectionhead}
     \vspace{-3mm}
     \begin{itemize}
-        \item More information: \URL[PB]{}{C++ reference}
+        \item A class template that manages an optional contained value, i.e.\ a value that may or may not be present.
+        \item A common use case for optional is the return value of a function that may fail.
+        \item No dynamic memory allocation ever takes place\\
+              \then \alert{an optional object models an object, not a pointer}
+        \item Possible tp contextually convert to \CPP|bool|
+        \item \CPP|std::nullopt| is used to indicate optional type with uninitialized state.
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/utility/optional}{C++ reference}
     \end{itemize}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{}
-    \begin{varblock}{example}[\textwidth]{}<only@1>
+    \begin{varblock}{example}[\textwidth]{Optional returning value}<only@1>
         \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<optional>+|
+            #include |+<sstream>+|
+
+            std::optional<int> to_int(const std::string& s) {
+                std::optional<int> oi{};
+                int i;
+                if(std::stringstream stm(s); stm >> i)
+                    if(stm.get() == std::char_traits<char>::eof())
+                        oi = i;
+                return oi;
+            }
+
+            int main()
+            {
+                auto number = to_int("-42");
+                std::cout << *number << '\n';
+            }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |++|
+            |+-42+|
+        \end{Bash}
+    \end{varblock}
+    \begin{varblock}{example}[\textwidth]{Optional arguments}<only@2>
+        \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<optional>+|
+            #include |+<string_view>+|
+
+            auto slice(std::string_view str,
+                       std::optional<int> start,
+                       std::optional<int> finish)
+            {
+                auto a = start.value_or(0);
+                auto b = end.value_or(str.size());
+                return str.substr(a, b-a);
+            }
+
+            int main()
+            {
+                std::cout
+                    << slice("Hello world!", 6, std::nullopt) << '\n'
+                    << slice("Hello world!", std::nullopt, 5) << '\n';
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+world!
+            Hello+|
         \end{Bash}
     \end{varblock}
 \end{frame}
@@ -67,37 +220,41 @@
 \begin{frame}[fragile]{\insertsectionhead}
     \vspace{-3mm}
     \begin{itemize}
+        \item A type-safe, single-value container\\ for any \textbf{copy-constructible type}.
+        \item Use \CPP|operator=| to assign value
+        \item Use \CPP|std::any_cast<T>| to retrieve value
+        \item Use \CPP|std::make_any<T>| in generic programming
         \item More information: \URL[PB]{}{C++ reference}
     \end{itemize}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{}
-    \begin{varblock}{example}[\textwidth]{}<only@1>
+    \begin{varblock}{example}[\textwidth]{Basic usage}<only@1>
         \begin{Cpp}
-        \end{Cpp}
-        \begin{Bash}[numbers=none]
-            |++|
-        \end{Bash}
-    \end{varblock}
-\end{frame}
-%============================================%
+            #include |+<any>+|
+            #include |+<iostream>+|
 
-%============================================%
-\section{\CPP|std::string\_view|}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\begin{frame}[fragile]{\insertsectionhead}
-    \vspace{-3mm}
-    \begin{itemize}
-        \item More information: \URL[PB]{}{C++ reference}
-    \end{itemize}
-\end{frame}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\begin{frame}[fragile]{}
-    \begin{varblock}{example}[\textwidth]{}<only@1>
-        \begin{Cpp}
+            int main()
+            {
+                std::any a = 1;
+                std::cout << '[' << std::any_cast<int>(a) << ", ";
+                a = 3.14;
+                std::cout << std::any_cast<double>(a) << ", ";
+                a = true;
+                std::cout << std::boolalpha
+                          << std::any_cast<bool>(a) << "]\n";
+
+                try {
+                    std::cout << std::any_cast<float>(a) << '\n';
+                }
+                catch (const std::bad_any_cast& e) {
+                    std::cout << e.what() << '\n';
+                }
+            }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |++|
+            |+[1, 3.14, true]
+            bad any cast+|
         \end{Bash}
     \end{varblock}
 \end{frame}
@@ -109,16 +266,45 @@
 \begin{frame}[fragile]{\insertsectionhead}
     \vspace{-3mm}
     \begin{itemize}
-        \item More information: \URL[PB]{}{C++ reference}
+        \item This library was originally developed as \URL[PB]{http://www.boost.org/doc/libs/release/libs/filesystem/doc/index.htm}{boost.filesystem}
+        \item It provides a standard way to manipulate \textbf{file objects}
+              \begin{itemize}
+                  \item directory
+                  \item regular file
+                  \item symbolic link
+                  \item other special file types (block, character, fifo, socket)
+              \end{itemize}
+              \textbf{file names} and \textbf{paths} in a filesystem.
+        \item \PP{Many additional features are available!}
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/filesystem}{C++ reference}
     \end{itemize}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{}
-    \begin{varblock}{example}[\textwidth]{}<only@1>
+    \begin{varblock}{example}[\textwidth]{Copy big file if existing and enough memory is available}<only@1>
         \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<filesystem>+|
+
+            namespace fs = std::filesystem;
+
+            int main()
+            {
+                const auto filePath {"bigFileToCopy"};
+                if (fs::exists(filePath)) {
+                    const auto fileSize {fs::file_size(filePath)};
+                    fs::path tmpPath {"/tmp"};
+                    if (fs::space(tmpPath).available > fileSize)
+                    {
+                        fs::create_directory(tmpPath.append("example"));
+                        fs::copy_file(filePath, tmpPath.append("new"));
+                    }
+                } else
+                std::cout << "File \"" << filePath << "\" not found.\n";
+            }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |++|
+            |+File "bigFileToCopy" not found.+|
         \end{Bash}
     \end{varblock}
 \end{frame}
@@ -130,17 +316,43 @@
 \begin{frame}[fragile]{\insertsectionhead}
     \vspace{-3mm}
     \begin{itemize}
-        \item More information: \URL[PB]{}{C++ reference}
+        \item Many of the STL algorithms started to support the parallel execution policies of the following possible types:
+              \begin{itemize}
+                  \item \CPP|sequenced_policy|
+                  \item \CPP|parallel_policy|
+                  \item \CPP|parallel_unsequenced_policy|
+              \end{itemize}
+        \item \alert{When using parallel execution policy, it is the programmer's responsibility to avoid data races and deadlocks}
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/algorithm\#Execution_policies}{C++ reference}
+        \item Unfortunately  \URL[PQ]{https://en.cppreference.com/w/cpp/compiler_support/17\#C.2B.2B17_library_features}{(Apple) Clang does not support them yet}
     \end{itemize}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{}
-    \begin{varblock}{example}[\textwidth]{}<only@1>
+    \begin{varblock}{example}[\textwidth]{Untested code}<only@1>
         \begin{Cpp}
+            #include |+<algorithm>+|
+            #include |+<vector>+|
+            #include |+<execution>+|
+
+            int main()
+            {
+                int a[] = {0,1};
+                std::vector<int> v;
+                std::for_each(std::execution::par,
+                              std::begin(a), std::end(a),
+                              [&](int i){
+                                  v.push_back(i*2+1); // Error: data race
+                              });
+
+                std::vector<int> longVector;
+                // Find element using parallel execution policy
+                auto result = std::find(std::execution::par,
+                                        std::begin(longVector),
+                                        std::end(longVector),
+                                        2);
+            }
         \end{Cpp}
-        \begin{Bash}[numbers=none]
-            |++|
-        \end{Bash}
     \end{varblock}
 \end{frame}
 %============================================%

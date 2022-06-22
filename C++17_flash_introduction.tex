@@ -23,6 +23,9 @@
 
 %Commands for this presentation
 \defbeamertemplate{description item}{bold label}{\textbf{\insertdescriptionitem}}
+\makeatletter
+    \newcommand*{\overlaynumber}{\number\beamer@slideinframe}
+\makeatother
 \newcommand{\Remark}[2][1mm]{\hspace{#1}{\tiny\{~#2~\}}}
 \newcommand{\tikzmark}[1]{\tikz[overlay,remember picture, baseline=-0.5ex] \node at (0,0) (#1) {};}
 \newcommand{\then}{\raisebox{2pt}{$\;\drsh\;$}}

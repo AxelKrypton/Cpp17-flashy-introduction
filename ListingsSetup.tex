@@ -40,23 +40,30 @@ literate=% literate={<replace>}{<replacement text>}{<width>}
   {\#include}{{{\color{CarnationPink}\#include}}}{7},
 morekeywords={size_t, T, pair, tuple, array, unordered_map, string, map, Widget,
               BadWidget, is_integral, initializer_list, byte, Type, logic_error,
-              error_info, variant, optional, any, string_view, filesystem},
+              error_info, variant, optional, any, string_view, filesystem, list, byte,
+              stringstream, char_traits, bad_variant_access, bad_any_cast, path,
+              sequenced_policy, parallel_policy, parallel_unsequenced_policy, vector},
 emph=[1]{main, get_mix, type_name, make_tuple, status, find, end, message, zip, boolalpha, size,
-         isIntegral,  foo, bar, is_success, do_something, do_something_ref, my_callback, is_error},
+         isIntegral,  foo, bar, is_success, do_something, do_something_ref, my_callback, is_error,
+         splice, invoke, apply, get, index, in_place_type, to_int, eof, slice, value_or,
+         substr, min, find_first_not_of, remove_prefix, getSV, what, any_cast, make_any,
+         copy_file, create_directory, append, exists, file_size, space, push_back, find,
+         for_each, begin},
 emphstyle=[1]{\color{NavyBlue}}, %Functions
 emph=[2]{x, y, z, cout, uns, n, pi, letter, label, mapping, key, content, argc, argv, it, m, s,
-         gadget, x2, x3, x4, b1, b2, b3, b4, ei, err, message},
+         gadget, x2, x3, x4, b1, b2, b3, b4, ei, err, message, var, v, w, i, oi, stm, number, a, b,
+         str, start, finish, nullopt, bad, e, filePath, fileSize, tmpPath, par, longVector, result},
 emphstyle=[2]{\color{Orange}}, %Variables
-emph=[3]{if, else, while, do, for, case, switch, inline},
+emph=[3]{if, else, while, do, for, case, switch, inline, try, catch},
 emphstyle=[3]{\color{violet}}, %Loops, if, etc.
 emph=[4]{const, auto, break, continue, default, static, return, struct, NULL, sizeof, typedef,
          template, typename, true, false, throw, public, class, constexpr, decltype, namespace, enum},
 emphstyle=[4]{\color{ProcessBlue}}, %Logical keywords
-emph=[5]{std, boost},
+emph=[5]{std, boost, literals, fs, execution},
 emphstyle=[5]{\color{Maroon}}, %Namespaces
-emph=[6]{__FUNCTION__, __has_include, static_assert},
+emph=[6]{__FUNCTION__, __has_include, static_assert, assert},
 emphstyle=[6]{\color{Gray}}, %Macros
-emph=[7]{second, value, id, count},
+emph=[7]{second, value, id, count, available},
 emphstyle=[7]{\color{Peach!50!Purple}}, %Members
 emph=[8]{OK, Bad, type_A, type_B},
 emphstyle=[8]{\color{Blue}}, % Enum members
