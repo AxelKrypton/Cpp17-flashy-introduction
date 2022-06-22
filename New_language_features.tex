@@ -1,0 +1,410 @@
+%-------------------------------%
+%  Author: Alessandro Sciarra   %
+%    Date: 14 Jun 2022          %
+%-------------------------------%
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{C++17 new language features I will \textbf{not} cover}
+    \begin{tabular}{l}
+        \URL[PB]{https://en.cppreference.com/w/cpp/language/class_template_argument_deduction}{~Template argument deduction for class templates}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/language/template_parameters}{~Declaring non-type template parameters with auto}\Remark{see item (4) at link}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/language/fold}{~Folding expressions}\Remark{relevant for variadic templates}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/language/lambda}{~\CPP|constexpr| lambda}\Remark{see specifiers at link}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/language/lambda\#Lambda_capture}{~Lambda capture this by value}\Remark{see item (8) at link}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/language/character_literal}{~UTF-8 character literals}\Remark{see item (2) at link}\\[1mm]
+        \URL[PB]{https://en.cppreference.com/w/cpp/preprocessor/include}{\CPP|__has_include|}\Remark{see items (4) and (5) at link}\\
+    \end{tabular}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}{C++17 new language features I will cover}
+    \tableofcontents
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Structured bindings}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    \begin{itemize}
+        \item De-structuring initialization that allows writing\\
+              \quad\CPP|auto [ x, y, z ] = expression;|
+        \item The type of \CPP|expression| is a tuple-like object, whose elements are bound to the variables \CPP|x|, \CPP|y|, and \CPP|z| which this construct declares
+        \item Tuple-like objects can be\\
+              \begin{itemize}
+                  \item[] \CPP|std::pair|,
+                  \item[] \CPP|std::tuple|,
+                  \item[] \CPP|std::array|,
+              \end{itemize}
+              and aggregate structures
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/language/structured_binding}{C++ reference}
+    \end{itemize}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \PrepareURLsymbol[red]
+    \begin{varblock}{example}[\textwidth]{One of my favourite features}<only@1>
+        \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<utility>+|
+            #include |+<string_view>+| // @|\URL*[red]{https://stackoverflow.com/a/56766138}{Very cool idea}|@
+            template <typename T> constexpr auto type_name() {...}
+
+            auto get_mix()
+            {
+                return std::make_tuple(42U, 42, 3.14, 'b', "Hello");
+            }
+
+            int main(){
+                auto [uns, n, pi, letter, label] = get_mix();
+                std::cout << "[" << type_name<decltype(uns)>() << ", "
+                          << type_name<decltype(n)>() << ", "
+                          << type_name<decltype(pi)>() << ", "
+                          << type_name<decltype(letter)>() << ", "
+                          << type_name<decltype(label)>() << "]\n";
+            }
+        \end{Cpp}
+        \smallskip
+        \begin{Bash}[numbers=none]
+            |+[unsigned int, int, double, char, const char *]+|
+        \end{Bash}
+    \end{varblock}
+    \begin{varblock}{example}[\textwidth]{Even cooler}<only@2>
+        \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<unordered_map>+|
+
+            int main(){
+                std::unordered_map<std::string, int> mapping {
+                    {"a", 1},
+                    {"b", 2},
+                    {"c", 3}
+                };
+
+                // Destructure by reference.
+                for (const auto& [key, content] : mapping) {
+                    std::cout << key << " -> " << content << "\n";
+                }
+            }
+        \end{Cpp}
+        \smallskip
+        \begin{Bash}[numbers=none]
+            |+b -> 2
+            c -> 3
+            a -> 1+|
+        \end{Bash}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Selection statements with initializer}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    \begin{itemize}
+        \item New versions of the \CPP|if| and \CPP|switch| statements which simplify common code patterns and help keeping scopes tight.\\
+              \begin{varblock}{}[0.73\textwidth]{How they look like:}
+                  \small
+                  \CPP|if(init-statement; condition)|\\[1mm]
+                  \CPP|switch(init-statement; condition)|
+              \end{varblock}
+              \par\medskip
+        \item Names declared by the \CPP|init-statement| (if it is a declaration) and names declared by \CPP|condition| (if it is a declaration) are in the same scope of all branches.
+    \end{itemize}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \begin{varblock}{example}[\textwidth]{New if and switch feature}<only@1>
+        \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<map>+|
+            #include |+<iomanip>+|
+            #include |+"widget.hpp"+|
+
+            int main(int argc, char *argv[])
+            {
+                std::map<int, std::string> m;
+                if (auto it = m.find(10); it != m.end())
+                    std::cout << it->second.size();
+                else
+                    std::cout << std::boolalpha << (it==m.end()) << "\n";
+
+                switch (Widget gadget(argc, argv);
+                        auto s = gadget.status())
+                {
+                    case OK: gadget.zip(); break;
+                    case Bad: throw BadWidget(s.message());
+                }
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+true+|
+        \end{Bash}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Compile time if conditions}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    \begin{itemize}
+        \item In a \CPP|constexpr if| statement, the value of the condition must be a \URL[PB]{https://en.cppreference.com/w/cpp/language/constant_expression\#Converted_constant_expression}{contextually converted constant expression of type \CPP|bool|} \Remark{until C++23}
+        \item  Depending on the condition, either the \CPP|if| or the \CPP|else| statement is discarded.
+        \item The return statements in a discarded statement do not participate in function return type deduction
+        \item Outside a template, a discarded statement is fully checked\\
+              {\footnotesize$\to\;$\CPP|if constexpr| is not a substitute for the \CPP|#if| preprocessing directive}
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/language/if\#Constexpr_if}{C++ reference}
+    \end{itemize}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \begin{varblock}{example}[\textwidth]{Compile time if clause}<only@1>
+        \begin{Cpp}
+            template <typename T>
+            constexpr bool isIntegral() {
+                if constexpr (std::is_integral<T>::value) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            struct Widget {};
+            int main(){
+                if constexpr(false) {
+                    int n = 0;
+                    //int *p = n; // Error even though discarded
+                }
+                static_assert(isIntegral<char>() == true);
+                static_assert(isIntegral<double>() == false);
+                static_assert(isIntegral<Widget>() == true);
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+$ clang++ -std=c++17 Example.cpp -o Example
+            Constexpr-if.cpp:26:5: error: static_assert failed due to requirement 'isIntegral<Widget>() == true'
+            [...]+|
+        \end{Bash}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Inline variables}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    \begin{itemize}
+        \item An inline variable has the same semantics as an inline function.\\[1mm]
+              {\scriptsize Together with other properties
+                There may be more than one definition of an inline variable in the program as long as each definition appears in a different translation unit and (for non-static inline variables) all definitions are identical. For example, an inline variable may be defined in a header file that is included in multiple source files.\par}
+        \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/language/inline}{C++ reference}
+    \end{itemize}
+    \begin{varblock}{example}[\textwidth]{Define a static member variable in \textbf{header} file!}<only@1>
+        \begin{Cpp}
+            struct Widget {
+                Widget() : id{count++} {}
+                ~Widget() { count--; }
+                int id;
+                // declare and initialize count to 0 within the class
+                static inline int count{0};
+            };
+        \end{Cpp}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{New rules for auto deduction from braced-init-list}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \begin{itemize}
+        \item Till C++14$^\star$, in
+              \begin{center}
+                  \CPP|auto x{3};|
+              \end{center}
+              \CPP|x| is deduced to be a
+              \begin{center}
+                  \CPP|std::initializer_list<int>|
+              \end{center}
+              which is at least unexpected \Remark{if not misleading}
+        \item In C++17 it is now deduced to be an \CPP|int|
+        \item Direct-list-initialization from a multiple-element braced-init-list is now ill-formed
+    \end{itemize}
+    \PrepareURLsymbol[PB]
+    \FrameRemark{$^\star$More precisely till paper \URL*{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3922.html}{N3922} approved in 2014 already in Urbana by the core working group (CWG) in \URL*{https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4251.html}{motion 16}.}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \PrepareURLsymbol[red]
+    \begin{varblock}{example}[\textwidth]{Pretty logic and easy to remember now}<only@1>
+        \begin{Cpp}
+            #include |+<iostream>+|
+            #include |+<utility>+|
+            #include |+<string_view>+| // @|\URL*[red]{https://stackoverflow.com/a/56766138}{Very cool idea}|@
+            template <typename T> constexpr auto type_name() {...}
+
+            int main(){
+                //auto x1 {1, 2, 3}; // error: not a single element
+                auto x2 = {1, 2, 3};
+                auto x3 {3u};
+                auto x4 {3.0f};
+                std::cout << type_name<decltype(x2)>() << "\n"
+                          << type_name<decltype(x3)>() << "\n"
+                          << type_name<decltype(x4)>() << "\n";
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+std::initializer_list<int>
+            unsigned int
+            float+|
+        \end{Bash}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Nested namespaces}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-6mm}
+    \begin{varblock}{example}[\textwidth]{Reducing boilerplate}<only@1>
+        \begin{Cpp}
+            // No alternatives till C++14
+            namespace A {
+                namespace B {
+                    namespace C {
+                        int i;
+                    }
+                }
+            }
+
+            // The code above can be written like this:
+            namespace A::B::C {
+                int i;
+            }
+        \end{Cpp}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Direct-list-initialization of enums}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    An enumeration can be initialized from an integer without a cast, using list initialization, if all of the following are true:
+    \begin{itemize}
+        \small
+        \item the initialization is direct-list-initialization
+        \item the initializer list has only a single element
+        \item the enumeration is either scoped or unscoped with underlying type fixed
+        \item the conversion is non-narrowing
+    \end{itemize}
+    \begin{varblock}{example}[\textwidth]{}<only@1>
+        \begin{Cpp}
+            enum byte : unsigned char {};
+            byte b1 {0};         // OK
+            byte b2 {-1};        // ERROR: narrowing conversion
+            byte b3 = byte{1};   // OK
+            byte b4 = byte{256}; // ERROR: narrowing conversion
+
+            enum Type {type_A, type_B};
+            Type x{1};           // ERROR: underline type not fixed
+        \end{Cpp}
+    \end{varblock}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{New attributes}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead}
+    \vspace{-3mm}
+    \begin{tabular}{p{\textwidth}}
+        \CPP|[[fallthrough]]|
+             \URL[PB]{https://en.cppreference.com/w/cpp/language/attributes/fallthrough}{C++ reference}\\[1mm]
+             It indicates to the compiler that falling through in a \CPP|switch| statement is intended behaviour\\[3mm]
+        \CPP|[[nodiscard]]|
+             \URL[PB]{https://en.cppreference.com/w/cpp/language/attributes/nodiscard}{C++ reference}\\[1mm]
+             It encourages the compiler to issue a warning if a function declared nodiscard or a function returning an enumeration or class declared nodiscard by value is called from a discarded-value expression other than a cast to \CPP|void|\\[3mm]
+        \CPP|[[maybe_unused]]|
+             \URL[PB]{https://en.cppreference.com/w/cpp/language/attributes/maybe_unused}{C++ reference}\\[1mm]
+             It suppresses compiler warnings on unused entities\\
+    \end{tabular}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \begin{varblock}{example}[\textwidth]{Fall through cases}<only@1>
+        \begin{Cpp}
+            switch (n) {
+                case 1:
+                case 2:
+                    foo();
+                    [[fallthrough]];
+                case 3: // no warning on fallthrough
+                    bar();
+                case 4: // compiler may warn on fallthrough
+                    if(n<3)
+                    {
+                        foo();
+                        [[fallthrough]];
+                    }
+                    else
+                        return;
+                default:
+                    throw std::logic_error("Hit default!");
+            }
+        \end{Cpp}
+    \end{varblock}
+    \begin{varblock}{example}[\textwidth]{Warn when discarding nodiscard types returned by value}<only@2>
+        \begin{Cpp}
+            // Only issues a warning when returned by value.
+            struct [[nodiscard]] error_info {
+                int id{0};
+            };
+
+            error_info do_something() {
+                return error_info{};
+            }
+
+            error_info& do_something_ref() {
+                static error_info err{};
+                return err;
+            }
+
+            int main(){
+                do_something();      // Warning
+                do_something_ref();  // No warning!
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+Attributes.cpp:16:5: warning: ignoring return value of function declared with 'nodiscard' attribute [...]+|
+        \end{Bash}
+    \end{varblock}
+    \begin{onlyenv}<3>
+        \begin{varblock}{example}[\textwidth]{Warn when discarding return values}
+            \begin{Cpp}
+                [[nodiscard]] bool do_something() {
+                    return is_success();
+                }
+
+                do_something(); // warning: ignoring return value
+                // declared with attribute 'nodiscard'
+            \end{Cpp}
+        \end{varblock}
+        \bigskip
+        \begin{varblock}{example}[\textwidth]{Unused entities}
+            \begin{Cpp}
+                void my_callback(std::string message,
+                                 [[maybe_unused]] bool is_error) {
+                    // Don't care if message is an error message
+                    log(message);
+                }
+            \end{Cpp}
+        \end{varblock}
+    \end{onlyenv}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%

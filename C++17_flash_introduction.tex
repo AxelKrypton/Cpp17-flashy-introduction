@@ -1,0 +1,108 @@
+\documentclass[usenames,dvipsnames,svgnames,14pt]{beamer}
+\usepackage[english]{babel}
+\usepackage{fontspec,fontawesome,mathabx,fp,tikzpeople}
+\usepackage{TeXnicalities}
+
+\setsansfont{Yanone Kaffeesatz}[
+    UprightFont     = *-Regular ,
+    BoldFont        = *-Bold ,
+    BoldItalicFont  = *-Bold ,
+    BoldSlantedFont = *-Bold ,
+    ItalicFont      = *-Light ,
+    SlantedFont     = *-Light ,
+    SmallCapsFont   = *-Thin
+]
+\graphicspath{{Figures/}}
+\usetheme{Z02}
+
+\usetikzlibrary{
+    positioning,
+    shapes,
+}
+\input{ListingsSetup}
+
+%Commands for this presentation
+\defbeamertemplate{description item}{bold label}{\textbf{\insertdescriptionitem}}
+\newcommand{\Remark}[2][1mm]{\hspace{#1}{\tiny\{~#2~\}}}
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture, baseline=-0.5ex] \node at (0,0) (#1) {};}
+\newcommand{\then}{\raisebox{2pt}{$\;\drsh\;$}}
+\newcommand{\MakeCoverSlide}{%
+    \begin{frame}[plain,noframenumbering]
+        \begin{tikzpicture}[remember picture, overlay]
+            \usebeamercolor{title page background canvas}
+            \fill[bg] (current page.south west) rectangle (current page.north east);
+            \node[text depth=0.5ex, anchor=north] (title) at ($(current page.north)-(0mm,8mm)$)
+               {\huge\usebeamercolor[fg]{title}\inserttitle};
+            \node[below = 3mm of title] (photo)
+            {%
+                \raisebox{-0.5\height}{\includegraphics[height=0.33\textheight]{C++_Logo}}%
+                \hspace{6mm}\raisebox{-0.5\height}{\usebeamercolor[fg]{title}\fontsize{60}{72}\selectfont 17}
+            };
+            \node[below = 5mm of photo] (author) {\large\insertauthor};
+            \node[below = 3mm of author] (date) {\usebeamerfont{date}\insertdate};
+            \node[anchor=south, outer sep=0mm] at (current page.south) {\includegraphics[width=10mm]{CC-BY}};
+        \end{tikzpicture}
+    \end{frame}
+}
+
+\AtBeginPart{%
+    \begin{frame}
+        \partpage
+    \end{frame}
+}
+
+%\AtBeginSection{%
+%    \begin{frame}
+%        \sectionpage
+%    \end{frame}
+%}
+
+\begin{document}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \title{A flashy introduction to}
+    \author{Alessandro~Sciarra}
+    \date{July 2022}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \MakeCoverSlide
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \begin{frame}{My expertise for the group}{\{\,in terms of programming languages\,\}}
+        \begin{tikzpicture}[every node/.style={circle, very thick, draw}, node distance=2mm]
+            \node[PS, minimum size=30mm, visible on=<1>] (bash) {Bash};
+            \node[PP, minimum size=27mm, right = of bash, alt=<1>{fill=none}{fill=PB!10, fill on=<2>}] (cpp) {C++};
+            \begin{scope}[scope on=<1>]
+                \node[PT, minimum size=23mm, right = of cpp, yshift=11.5mm] (latex) {LaTeX};
+                \node[PB, minimum size=23mm, right = of latex] (python) {Python};
+                \node[PQ, minimum size=15mm, below = of $(latex.south)!0.5!(python.south)$ ] (git) {Git};
+            \end{scope}
+            \node[PB, draw=none, right = of cpp, visible on=<2>, text width=3cm, align=center]{Today we want to explore some modern features!};
+        \end{tikzpicture}
+        \begin{varblock}{alert}[0.9\textwidth]{Whenever you wish}
+            Come and torture me with all your nagging questions!
+        \end{varblock}
+        \FrameRemark{Clean code as common aspect orthogonal to any language!}
+    \end{frame}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \begin{frame}{Disclaimer}
+        \vspace{-3mm}
+        \centering
+        \begin{center}
+            \hyperlink{P1}{\PB{\large Part 1:} New language features}\\[3mm]
+            \hyperlink{P2}{\PB{\large Part 2:} New library features}
+        \end{center}
+        \begin{varblock}{alert}{That's not all the folks!}
+            I just took the main topics which I think it might be interesting to start with and I will either give you a taste of them or simply point you to some reference!
+        \end{varblock}
+        \bigskip
+        \URL[PS]{https://en.cppreference.com/w/cpp/17}{Cppreference of C++17 standard}\\[3mm]
+        \URL[PT]{https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf}{Free draft version, 1608 pages}
+    \end{frame}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \label{P1}
+    \part{New language features}
+    \input{New_language_features}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \label{P2}
+    \part{New library features}
+    \input{New_library_features}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\end{document}
