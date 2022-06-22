@@ -306,3 +306,6 @@ TSWLatexianTemp*
 # Ignore executable for testing code
 Cpp/*
 !Cpp/*.cpp
+
+# Ignore main pdf file
+C++17_flash_introduction.pdf
