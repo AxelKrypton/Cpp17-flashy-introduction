@@ -1,7 +1,7 @@
 #include <iostream>
 #include <optional>
 
-#if 0
+#if 1
 
 #include <sstream>
 
@@ -9,13 +9,14 @@ std::optional<int> to_int(const std::string& s ) {
     std::optional<int> oi{}; int i;
     if( std::stringstream stm(s); stm >> i )
         if( stm.get() == std::char_traits<char>::eof() )
-            oi = i; return oi;
+            oi = i;
+    return oi;
 }
 
 int main()
 {
     auto number = to_int("-42");
-    std::cout << *number << '\n';
+    std::cout << *number << " == " << number.value() << '\n';
 }
 
 #else

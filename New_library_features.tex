@@ -61,7 +61,7 @@
             }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |+_   trim me_	_trim me_
+            |+_   trim me_    _trim me_
             p4Ek+|
         \end{Bash}
     \end{varblock}
@@ -148,12 +148,13 @@
 \begin{frame}[fragile]{\insertsectionhead}
     \vspace{-3mm}
     \begin{itemize}
-        \item A class template that manages an optional contained value, i.e.\ a value that may or may not be present.
-        \item A common use case for optional is the return value of a function that may fail.
+        \item A class template that manages an optional contained value, i.e.\ a value that may or may not be present
+        \item A common use case for optional is the return value of a function that may fail
         \item No dynamic memory allocation ever takes place\\
               \then \alert{an optional object models an object, not a pointer}
-        \item Possible tp contextually convert to \CPP|bool|
-        \item \CPP|std::nullopt| is used to indicate optional type with uninitialized state.
+        \item Possible to contextually convert to \CPP|bool|
+        \item \CPP|std::nullopt| is used to indicate optional type with uninitialized state
+        \item Use \CPP|std::make_optional<T>| if needed
         \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/utility/optional}{C++ reference}
     \end{itemize}
 \end{frame}
@@ -177,11 +178,11 @@
             int main()
             {
                 auto number = to_int("-42");
-                std::cout << *number << '\n';
+                std::cout << *number << " == " << number.value() << '\n';
             }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |+-42+|
+            |+-42 == -42 +|
         \end{Bash}
     \end{varblock}
     \begin{varblock}{example}[\textwidth]{Optional arguments}<only@2>
@@ -300,7 +301,8 @@
                         fs::copy_file(filePath, tmpPath.append("new"));
                     }
                 } else
-                std::cout << "File \"" << filePath << "\" not found.\n";
+                    std::cout
+                        << "File \"" << filePath << "\" not found.\n";
             }
         \end{Cpp}
         \begin{Bash}[numbers=none]
@@ -345,7 +347,7 @@
                                   v.push_back(i*2+1); // Error: data race
                               });
 
-                std::vector<int> longVector;
+                std::vector<int> longVector /* Initialization */;
                 // Find element using parallel execution policy
                 auto result = std::find(std::execution::par,
                                         std::begin(longVector),

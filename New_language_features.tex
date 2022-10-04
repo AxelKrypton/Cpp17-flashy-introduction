@@ -407,4 +407,128 @@
         \end{varblock}
     \end{onlyenv}
 \end{frame}
+%============================================%
+
+%============================================%
+\section{Throwing in a destructor}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead: Is it still bad practice?}
+    \begin{itemize}
+        \item It has been considered bad practice for years\\
+              \then \URL[ALERT]{http://www.gotw.ca/gotw/047.htm}{Blog from Herb Sutter (2009)}
+        \item \CPP|bool std::uncaught_exception()|\\
+              detects only if the current thread has a live exception object\\
+              \then it fails to cover all use cases!
+        \item C++17 introduces \CPP|int std::uncaught_exceptions()|\\
+              that says how many uncaught exceptions exist\\
+              \then see \URL[PB]{https://stackoverflow.com/a/49503194/14967071}{this SO answer} for a nice example
+    \end{itemize}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Mandatory elision of copy/move operations}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}{\insertsectionhead}
+    In return and assignment statements, often$^{\star}$ {\footnotesize\quad\URL[PB]{https://en.cppreference.com/w/cpp/language/copy_elision}{[Precise rule here]}}
+    \begin{itemize}
+        \item The compilers are required to omit the copy and move construction of class objects
+        \item Even if the copy/move constructor and the destructor have observable side-effects
+        \item The objects are constructed directly into the storage where they would otherwise be copied/moved to \item The copy/move constructors need not be present or accessible
+    \end{itemize}
+    \begin{varblock}{alert}[\textwidth]{When copy/move operations are not guaranteed}
+        Even if the copy/move constructor is not called, it still must be present and accessible, otherwise the program is ill-formed!
+    \end{varblock}
+    \PrepareURLsymbol[PB]
+    \FrameRemark{$^{\star}$ \textbf{often} $\equiv$ when the operand or initializer expression is a \URL*{https://en.cppreference.com/w/cpp/language/value_category}{prvalue} of the same class type (ignoring cv-qualification).}
+\end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{}
+    \begin{varblock}{example}[\textwidth]{}<only@1>
+        \begin{Cpp}
+            #include |+<iostream>+|
+
+            struct C {
+                C() { std::cout << "Default ctor called.\n"; }
+                C(const C&) { std::cout << "Copy ctor called.\n"; }
+                C(C&&) { std::cout << "Move ctor called.\n"; }
+            };
+
+            C foo() { return C(); } // Guaranteed to perform copy elision
+            C bar() { C c; return c; } // Maybe performs copy elision
+
+            int main() {
+                C obj = foo(); // Move constructor isn't called
+                std::cout << "-------\n";
+                C obj2 = bar();
+            }
+        \end{Cpp}
+        \begin{lstlisting}[style=MyBash, numbers=none]
+            |+$ g++ -fno-elide-constructors -std=c++17\
+                  -o Copy-move-elision Copy-move-elision.cpp\
+                  && ./Copy-move-elision
+            Default ctor called.
+            -------
+            Default ctor called.
+            Move ctor called.+|
+        \end{lstlisting}
+    \end{varblock}
+    \begin{varblock}{example}[\textwidth]{}<only@2>
+        \begin{Cpp}
+            #include |+<iostream>+|
+
+            struct C {
+                C() { std::cout << "Default ctor called.\n"; }
+                C(const C&) = delete;
+                C(C&&) = delete;
+            };
+
+            C foo() { return C(); } // Guaranteed to perform copy elision
+
+            /*
+             * Uncommenting results in compilation error, since
+             * move/copy elision is not guaranteed here!
+             */
+            // C bar() { C c; return c; }
+
+            int main() {
+                C obj = foo(); //Move constructor isn't called
+            }
+        \end{Cpp}
+        \begin{lstlisting}[style=MyBash, numbers=none]
+            |+$ g++ -fno-elide-constructors -std=c++17\
+                  -o Copy-move-elision Copy-move-elision.cpp\
+                  && ./Copy-move-elision
+            Default ctor called.+|
+        \end{lstlisting}
+    \end{varblock}
+    \begin{varblock}{example}[\textwidth]{}<only@3>
+        \begin{Cpp}
+            #include |+<iostream>+|
+
+            struct C {
+                C() { std::cout << "Default ctor called.\n"; }
+                C(const C&) = delete;
+                C(C&&) = delete;
+            };
+
+            C bar() { C c; return c; }
+
+            int main() { return 0; }
+        \end{Cpp}
+        \begin{lstlisting}[style=MyBash, numbers=none]
+            |+$ g++ -std=c++17\
+                  -o Copy-move-elision Copy-move-elision.cpp\
+                  && ./Copy-move-elision
+            Copy-move-elision.cpp:9:23: error: call to deleted constructor of 'C'
+            C bar() { C c; return c; }
+            ^
+            Copy-move-elision.cpp:5:5: note: 'C' has been explicitly marked deleted here
+            C(const C&) = delete;
+            ^
+            1 error generated.+|
+        \end{lstlisting}
+    \end{varblock}
+\end{frame}
+%============================================%
+

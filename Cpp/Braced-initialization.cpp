@@ -26,11 +26,13 @@ using namespace std::string_literals;
 
 int main(){
     //auto x1 {1, 2, 3}; // error: not a single element
+    auto x1 = {1};
     auto x2 = {1, 2, 3};
     auto x3 {3u};
     auto x4 {3.0f};
     auto x5 {"abc"s};
-    std::cout << type_name<decltype(x2)>() << "\n"
+    std::cout << type_name<decltype(x1)>() << "\n"
+              << type_name<decltype(x2)>() << "\n"
               << type_name<decltype(x3)>() << "\n"
               << type_name<decltype(x4)>() << "\n"
               << type_name<decltype(x5)>() << "\n";
