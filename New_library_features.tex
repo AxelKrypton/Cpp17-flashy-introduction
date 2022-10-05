@@ -75,10 +75,11 @@
     \vspace{-3mm}
     \begin{itemize}
         \item A class template that represents a type-safe union
-        \item An instance of \CPP|std::variant| at any given time either holds a value of one of its alternative types, or in the case of error, no value \Remark{generally hard to achieve}
+        \item An instance of \,\CPP|std::variant|\, at any given time either holds a value of one of its alternative types, or in the case of error, no value \Remark{generally hard to achieve}
         \item Assign values at construction or using the \CPP|operator=|
-        \item Retrieve values using the \CPP|std::get<T>()| function
+        \item Retrieve values using the \,\CPP|std::get<T>()|\, function
         \item \alert{Revolution in inheritance patterns (e.g. visitor)}
+        \item Use the \URL[PB]{https://en.cppreference.com/w/cpp/utility/variant/visit}{non-member function} \,\CPP|std::visit|\, to apply a callable to the value hold by variant(s)
         \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/utility/variant}{C++ reference}
     \end{itemize}
 \end{frame}
@@ -96,6 +97,7 @@
                 v = 42; // v contains int
                 int i = std::get<int>(v);
                 assert(42 == i); // succeeds
+
                 w = std::get<int>(v);
                 w = std::get<0>(v); // same effect as the previous line
                 w = v;              // same effect as the previous line

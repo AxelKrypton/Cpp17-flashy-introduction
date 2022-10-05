@@ -198,8 +198,9 @@
     \vspace{-3mm}
     \begin{itemize}
         \item An inline variable has the same semantics as an inline function.\\[1mm]
-              {\scriptsize Together with other properties
-                There may be more than one definition of an inline variable in the program as long as each definition appears in a different translation unit and (for non-static inline variables) all definitions are identical. For example, an inline variable may be defined in a header file that is included in multiple source files.\par}
+              {\scriptsize
+                Together with other properties there may be more than one definition of an inline variable in the program as long as each definition appears in a different translation unit and (for non-static inline variables) all definitions are identical.
+                For example, an inline variable may be defined in a header file that is included in multiple source files.\par}
         \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/language/inline}{C++ reference}
     \end{itemize}
     \begin{varblock}{example}[\textwidth]{Define a static member variable in \textbf{header} file!}<only@1>
@@ -273,16 +274,16 @@
     \begin{varblock}{example}[\textwidth]{Reducing boilerplate}<only@1>
         \begin{Cpp}
             // No alternatives till C++14
-            namespace A {
-                namespace B {
-                    namespace C {
+            namespace ns1 {
+                namespace ns2 {
+                    namespace ns3 {
                         int i;
                     }
                 }
             }
 
-            // The code above can be written like this:
-            namespace A::B::C {
+            // The code above can be written like this with C++17
+            namespace ns1::ns2::ns3 {
                 int i;
             }
         \end{Cpp}
@@ -391,8 +392,8 @@
                     return is_success();
                 }
 
-                do_something(); // warning: ignoring return value
-                // declared with attribute 'nodiscard'
+                do_something(); // Warning: ignoring return value
+                                // declared with attribute 'nodiscard'
             \end{Cpp}
         \end{varblock}
         \bigskip
@@ -418,7 +419,7 @@
               \then \URL[ALERT]{http://www.gotw.ca/gotw/047.htm}{Blog from Herb Sutter (2009)}
         \item \CPP|bool std::uncaught_exception()|\\
               detects only if the current thread has a live exception object\\
-              \then it fails to cover all use cases!
+              \then it fails to cover all use cases! \Remark{Deprecated in C++17, removed in C++20}
         \item C++17 introduces \CPP|int std::uncaught_exceptions()|\\
               that says how many uncaught exceptions exist\\
               \then see \URL[PB]{https://stackoverflow.com/a/49503194/14967071}{this SO answer} for a nice example
@@ -430,9 +431,9 @@
 \section{Mandatory elision of copy/move operations}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}{\insertsectionhead}
-    In return and assignment statements, often$^{\star}$ {\footnotesize\quad\URL[PB]{https://en.cppreference.com/w/cpp/language/copy_elision}{[Precise rule here]}}
+    In C++17, often$^{\star}$, in return and assignment statements:\hfill {\footnotesize\URL[PB]{https://en.cppreference.com/w/cpp/language/copy_elision}{[Precise rule]}}
     \begin{itemize}
-        \item The compilers are required to omit the copy and move construction of class objects
+        \item The compilers \alert{\textbf{are required}} to omit the copy and move construction of class objects
         \item Even if the copy/move constructor and the destructor have observable side-effects
         \item The objects are constructed directly into the storage where they would otherwise be copied/moved to \item The copy/move constructors need not be present or accessible
     \end{itemize}

@@ -31,6 +31,7 @@ int main(){
     auto x3 {3u};
     auto x4 {3.0f};
     auto x5 {"abc"s};
+    // auto x6 {{'a', 'b', 'c'}}; // https://stackoverflow.com/a/59471865/14967071
     std::cout << type_name<decltype(x1)>() << "\n"
               << type_name<decltype(x2)>() << "\n"
               << type_name<decltype(x3)>() << "\n"

@@ -43,7 +43,10 @@
             };
             \node[below = 5mm of photo] (author) {\large\insertauthor};
             \node[below = 3mm of author] (date) {\usebeamerfont{date}\insertdate};
-            \node[anchor=south, outer sep=0mm] at (current page.south) {\includegraphics[width=10mm]{CC-BY}};
+            \node[anchor=south, outer sep=0mm, font=\footnotesize] at (current page.south) {
+                \includegraphics[width=10mm]{CC-BY}\quad
+                \raisebox{1pt}{\color{PB}\href{https://github.com/AxelKrypton}{\faGithub\ AxelKrypton}}
+            };
         \end{tikzpicture}
     \end{frame}
 }
