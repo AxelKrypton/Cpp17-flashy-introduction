@@ -1,6 +1,6 @@
 \documentclass[usenames,dvipsnames,svgnames,14pt]{beamer}
 \usepackage[english]{babel}
-\usepackage{fontspec,fontawesome,mathabx,fp,tikzpeople}
+\usepackage{fontspec,fontawesome,mathabx,fp,pgfornament}
 \usepackage{TeXnicalities}
 
 \setsansfont{Yanone Kaffeesatz}[
@@ -13,7 +13,12 @@
     SmallCapsFont   = *-Thin
 ]
 \graphicspath{{Figures/}}
-\usetheme{Z02}
+
+\mode<presentation>
+{
+    \usetheme{Z02}
+    \setbeamersize{text margin left=8mm, text margin left=8mm}
+}
 
 \usetikzlibrary{
     positioning,
@@ -25,6 +30,9 @@
 \defbeamertemplate{description item}{bold label}{\textbf{\insertdescriptionitem}}
 \makeatletter
     \newcommand*{\overlaynumber}{\number\beamer@slideinframe}
+    \newlength{\textsize}
+    \setlength{\textsize}{\f@size pt}
+    \newcommand{\emoji}[1]{\;\raisebox{-0.15\textsize}{\includegraphics[height=\f@size pt]{#1}}}
 \makeatother
 \newcommand{\then}{\raisebox{2pt}{$\;\drsh\;$}}
 \newcommand{\MakeCoverSlide}{%
@@ -44,6 +52,12 @@
             \node[anchor=south, outer sep=0mm, font=\footnotesize] at (current page.south) {
                 \includegraphics[width=10mm]{CC-BY}\quad
                 \raisebox{1pt}{\color{PB}\href{https://github.com/AxelKrypton}{\faGithub\ AxelKrypton}}
+            };
+            \node[anchor=south west] at (current page.south west) {
+                \includegraphics[width=20mm]{LogoGoethe}
+            };
+            \node[anchor=south east] at (current page.south east) {
+                \includegraphics[width=20mm]{LogoCRC}
             };
         \end{tikzpicture}
     \end{frame}
@@ -65,25 +79,90 @@
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \title{A flashy introduction to}
     \author{Alessandro~Sciarra}
-    \date{06 October 2022}
+    \date{14 April 2023}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \MakeCoverSlide
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-    \begin{frame}{My expertise for the group}{\{\,in terms of programming languages\,\}}
+    \begin{frame}[fragile]{Kick-off riddle: Does this code compile?}{\uncover<2->{An (ab)use of the language}}
+        \begin{columns}
+            \begin{column}{0.58\textwidth}
+                \begin{varblock}{}[\textwidth]{}
+                    \begin{Cpp}
+                        #include |+<iostream>+|
+
+                        int main() {
+                            |=https://github.com/AxelKrypton=|
+                            int x = 42;
+                            std::cout << x << '\n';
+                        }
+                    \end{Cpp}
+                    \begin{uncoverenv}<2->
+                        \begin{Bash}[numbers=none]
+                            42
+                        \end{Bash}
+                    \end{uncoverenv}
+                \end{varblock}
+            \end{column}
+            \begin{column}{0.42\textwidth}
+                \centering
+                \includegraphics[width=\columnwidth]{WIITY}
+            \end{column}
+        \end{columns}
+        \vspace{3mm}
+        \begin{uncoverenv}<2->
+            \begin{center}
+                \Large
+                \URL[PB]{https://godbolt.org/z/Y6Yb7M79T}{~Yes, it does!} But why?\\[5mm]
+                \footnotesize
+                \uncover<3>{
+                    \emoji{Sunglasses}\;
+                    Because \;\texttt{https:}\; is a \;\CPP|goto|\; label and the rest of the line a comment! \emoji{Sunglasses}
+                }
+            \end{center}
+        \end{uncoverenv}
+    \end{frame}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \begin{frame}{My main expertise for the CRC-TR\,211}{\{\,in terms of programming languages\,\}}
         \begin{tikzpicture}[every node/.style={circle, very thick, draw}, node distance=2mm]
             \node[PS, minimum size=30mm, visible on=<1>] (bash) {Bash};
             \node[PP, minimum size=27mm, right = of bash, alt=<1>{fill=none}{fill=PB!10, fill on=<2>}] (cpp) {C++};
             \begin{scope}[scope on=<1>]
                 \node[PT, minimum size=23mm, right = of cpp, yshift=11.5mm] (latex) {LaTeX};
-                \node[PB, minimum size=23mm, right = of latex] (python) {Python};
-                \node[PQ, minimum size=15mm, below = of $(latex.south)!0.5!(python.south)$ ] (git) {Git};
+                \node[PB, minimum size=23mm, right = of latex] (git) {Git};
+                \node[PQ, minimum size=15mm, below = of $(latex.south)!0.5!(git.south)$ ] (python) {Python};
             \end{scope}
             \node[PB, draw=none, right = of cpp, visible on=<2>, text width=3cm, align=center]{Today we want to explore some modern features!};
         \end{tikzpicture}
-        \begin{varblock}{alert}[0.9\textwidth]{Whenever you wish}
+        \begin{varblock}{alert}[0.9\textwidth]{Let's have a chat}
+            Clean code as common aspect orthogonal to any language!\\
             Come and torture me with all your nagging questions!
         \end{varblock}
-        \FrameRemark{Clean code as common aspect orthogonal to any language!}
+    \end{frame}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \begin{frame}{C++ standards: A simplistic overview}
+        \begin{description}[<+(1)->]
+            \item[C++98] First standardization\quad
+            \PB{C++03} Some polishing
+            \item[C++11] \alert{Turning point}\\
+                         \then Move semantics, \CPP|auto|, lambdas, \CPP|constexpr|,\\
+                         \phantom{\then }smart pointers, type-traits, variadic templates, etc.
+            \item[C++14] Small improvements\\
+                         \then {better lambdas and better \CPP|constexpr|,\\
+                         \phantom{\then }return type deduction, variable templates, etc.}
+            \item[C++17] \PS{Larger improvements $\;\to\;$ this talk!}
+            \item[C++20] \alert{Turning point}\\
+                         \then Concepts, modules, coroutines, ranges, etc.
+            \item[C++23] Small improvements $\;\to\;$ mdspan, expected, print, etc.
+        \end{description}
+    \end{frame}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \begin{frame}{Is C++ growing more and more?}{How should I be supposed to learn it?}
+        \begin{uncoverenv}<2>
+            \begin{center}
+                \includegraphics[width=0.9\textwidth]{Toolkit}\\[1mm]
+                Think of it as a toolkit, you aren't always gonna need everything!
+            \end{center}
+        \end{uncoverenv}
     \end{frame}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \begin{frame}{Disclaimer}
@@ -108,5 +187,57 @@
     \label{P2}
     \part{New library features}
     \input{New_library_features}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \part{Your next C++ years}
+    \begin{frame}{\uncover<2->{Which is the best way to go, now?}}
+        \begin{onlyenv}<1>
+            \begin{tikzpicture}[remember picture, overlay]
+                \node at (current page.center) {
+                    \includegraphics[width=0.88\textwidth]{LearnCpp}
+                };
+            \end{tikzpicture}
+        \end{onlyenv}
+        \vspace{5mm}
+        \begin{overlayarea}{\textwidth}{0.23\textheight}
+            \begin{onlyenv}<2>
+                \begin{itemize}
+                    \item Consider exploring new features
+                    \item Take a decision in your codebase/team
+                    \item There are better and better way to write the same code!
+                \end{itemize}
+            \end{onlyenv}
+            \begin{onlyenv}<3>
+                \begin{center}
+                    \LARGE Thank you! Questions?
+                \end{center}
+            \end{onlyenv}
+        \end{overlayarea}
+        \begin{uncoverenv}<2->
+            \begin{center}
+                \begin{tikzpicture}[every node/.style={inner sep=0pt}, pgfornamentstyle/.style={color=PS}]
+                    \def\ornsize{11mm}
+                    \node[font=\large, text=PB](Text) {%
+                        \begin{tabular}{c}
+                            Every day, work to refine the skills you have\\
+                            and to add new tools to your repertoire.\\[1mm]
+                            {\normalsize---~The pragmatic programmer~---}
+                        \end{tabular}
+                    };
+                    \node[shift={(-12mm,6mm)},anchor=north west] (CNW)
+                    at (Text.north west) {\pgfornament[width=\ornsize]{61}};
+                    \node[shift={(12mm,6mm)},anchor=north east] (CNE)
+                    at (Text.north east) {\pgfornament[width=\ornsize,symmetry=v]{61}};
+                    \node[shift={(-12mm,-5mm)},anchor=south west] (CSW)
+                    at (Text.south west) {\pgfornament[width=\ornsize,symmetry=h]{61}};
+                    \node[shift={(12mm,-5mm)},anchor=south east] (CSE)
+                    at (Text.south east) {\pgfornament[width=\ornsize,symmetry=c]{61}};
+                    \pgfornamentline{CNW.north east}{CNE.north west}{3}{88}
+                    \pgfornamentline{CSW.south east}{CSE.south west}{3}{88}
+                    \pgfornamentline{CNW.south west}{CSW.north west}{2}{88}
+                    \pgfornamentline{CNE.south east}{CSE.north east}{2}{88}
+                \end{tikzpicture}
+            \end{center}
+        \end{uncoverenv}
+    \end{frame}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \end{document}

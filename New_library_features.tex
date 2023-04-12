@@ -4,7 +4,8 @@
 %-------------------------------%
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\begin{frame}[fragile]{C++17 new library features I will \textbf{not} cover}
+\begin{frame}[fragile]{C++17 new library features I will \textbf{NOT} cover}
+    \hspace*{5mm}
     \begin{tabular}{l}
         \URL[PB]{https://en.cppreference.com/w/cpp/numeric/special_functions}{~Mathematical special functions} (still  \URL[PT]{https://en.cppreference.com/w/cpp/compiler_support/17\#C.2B.2B17_library_features}{GNU compiler only})\\[1mm]
         \URL[PB]{https://en.cppreference.com/w/cpp/types/byte}{~\CPP|std::byte|}\\[1mm]
@@ -16,7 +17,31 @@
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}{C++17 new library features I will cover}
-    \tableofcontents
+    \vspace{-3mm}
+    \hspace*{1cm}
+    \begin{minipage}[t][0.65\textheight]{\textwidth}
+        \tableofcontents
+    \end{minipage}
+\end{frame}
+%============================================%
+
+%============================================%
+\section{Throwing in a destructor}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[fragile]{\insertsectionhead: Is it still bad practice?}
+    \begin{itemize}
+        \item It has been considered bad practice for years\\
+        \then \URL[ALERT]{http://www.gotw.ca/gotw/047.htm}{Blog from Herb Sutter (2009)}
+        \item \CPP|bool std::uncaught_exception()|\\
+        detects only if the current thread has a live exception object\\
+        \then it fails to cover all use cases! \Remark{Deprecated in C++17, removed in C++20}
+        \item C++17 introduces \CPP|int std::uncaught_exceptions()|\\
+        that says how many uncaught exceptions exist\\
+        \then see \URL[PB]{https://stackoverflow.com/a/49503194/14967071}{this SO answer} for a nice example
+    \end{itemize}
+    \begin{varblock}{}[0.68\textwidth]{If you need it}
+        You can now safely throw from a destructor!
+    \end{varblock}
 \end{frame}
 %============================================%
 
@@ -28,8 +53,8 @@
     \begin{itemize}
         \item A \alert{non-owning} reference to a string, it is just a view!
         \item Useful for providing an abstraction on top of strings \Remark{e.g.\ for parsing}
-        \item There are view modification functions which do not affect viewed string
-        \item \CPP|std::string_view| doesn't use null terminators to mark the end of the string
+        \item There are view modification functions which do not affect the viewed string
+        \item \CPP|std::string_view| \alert{doesn't use null terminators} to mark the end of the string
         \item \PP{Prefer passing string views by value to constant refs to strings!}\\
               \then \URL[PB]{https://stackoverflow.com/a/40129198/14967071}{How is it faster?}
         \item More information: \URL[PB]{https://en.cppreference.com/w/cpp/string/basic_string_view}{C++ reference}
@@ -141,6 +166,31 @@
             |+bad_variant_access+|
         \end{Bash}
     \end{varblock}
+    \begin{varblock}{example}[\textwidth]{Basic usage (\overlaynumber)}<only@3>
+        \begin{Cpp}
+            #include |+<variant>+|
+            #include |+<iostream>+|
+            #include |+<vector>+|
+
+            using var_t = std::variant<int, long, double, std::string>;
+
+            int main()
+            {
+                std::vector<var_t> vec = {10, 15l, 1.6, "hello"};
+                for (auto& v: vec) {
+                    // value-returning visitor, returning another variant
+                    var_t w = std::visit([](auto&& arg) -> var_t {
+                                             return arg + arg;
+                                         }, v);
+                    // void visitor, only called for side-effects
+                    std::visit([](auto&& arg){std::cout << arg;}, w);
+                }
+            }
+        \end{Cpp}
+        \begin{Bash}[numbers=none]
+            |+20 30 3.2 hellohello+|
+        \end{Bash}
+    \end{varblock}
 \end{frame}
 %============================================%
 
@@ -181,6 +231,7 @@
             {
                 auto number = to_int("-42");
                 std::cout << *number << " == " << number.value() << '\n';
+                // *opt is UB if opt does not contain a value!!
             }
         \end{Cpp}
         \begin{Bash}[numbers=none]

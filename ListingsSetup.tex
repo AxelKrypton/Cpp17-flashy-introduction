@@ -34,6 +34,7 @@ keywordstyle=\color{OliveGreen},
 stringstyle=\color{ForestGreen},
 commentstyle=\color{red},
 moredelim=[is][\color{ForestGreen}]{|+}{+|},
+moredelim=[is][\color{black}]{|=}{=|},
 literate=% literate={<replace>}{<replacement text>}{<width>}
   {\#define}{{{\color{CarnationPink}\#define}}}{6}
   {\#if}{{{\color{CarnationPink}\#if}}}{3}
@@ -41,7 +42,7 @@ literate=% literate={<replace>}{<replacement text>}{<width>}
 morekeywords={size_t, T, pair, tuple, array, unordered_map, string, map, Widget,
               BadWidget, is_integral, initializer_list, byte, Type, logic_error,
               error_info, variant, optional, any, string_view, filesystem, list, byte,
-              stringstream, char_traits, bad_variant_access, bad_any_cast, path,
+              stringstream, char_traits, bad_variant_access, var_t, bad_any_cast, path,
               sequenced_policy, parallel_policy, parallel_unsequenced_policy, vector, C},
 emph=[1]{main, get_mix, type_name, make_tuple, status, find, end, message, zip, boolalpha, size,
          isIntegral,  foo, bar, is_success, do_something, do_something_ref, my_callback, is_error,
@@ -53,11 +54,11 @@ emphstyle=[1]{\color{NavyBlue}}, %Functions
 emph=[2]{x, y, z, cout, uns, n, pi, letter, label, mapping, key, content, argc, argv, it, m, s,
          gadget, x2, x3, x4, b1, b2, b3, b4, ei, err, message, var, v, w, i, oi, stm, number, a, b,
          str, start, finish, nullopt, bad, e, filePath, fileSize, tmpPath, par, longVector, result,
-         obj, obj2},
+         obj, obj2, vec, arg},
 emphstyle=[2]{\color{Orange}}, %Variables
-emph=[3]{if, else, while, do, for, case, switch, inline, try, catch},
+emph=[3]{if, else, while, do, for, case, switch, inline, try, catch, goto},
 emphstyle=[3]{\color{violet}}, %Loops, if, etc.
-emph=[4]{const, auto, break, continue, default, static, return, struct, NULL, sizeof, typedef,
+emph=[4]{const, auto, break, continue, default, static, return, struct, NULL, sizeof, typedef, using,
          template, typename, true, false, throw, public, class, constexpr, decltype, namespace, enum},
 emphstyle=[4]{\color{ProcessBlue}}, %Logical keywords
 emph=[5]{std, boost, literals, fs, execution},

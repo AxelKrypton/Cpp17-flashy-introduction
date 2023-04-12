@@ -4,7 +4,8 @@
 %-------------------------------%
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\begin{frame}[fragile]{C++17 new language features I will \textbf{not} cover}
+\begin{frame}[fragile]{C++17 new language features I will \textbf{NOT} cover}
+    \hspace*{5mm}
     \begin{tabular}{l}
         \URL[PB]{https://en.cppreference.com/w/cpp/language/class_template_argument_deduction}{~Template argument deduction for class templates}\\[1mm]
         \URL[PB]{https://en.cppreference.com/w/cpp/language/template_parameters}{~Declaring non-type template parameters with auto}\Remark{see item (4) at link}\\[1mm]
@@ -17,7 +18,11 @@
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}{C++17 new language features I will cover}
-    \tableofcontents
+    \vspace{-3mm}
+    \hspace*{1cm}
+    \begin{minipage}[t][0.75\textheight]{\textwidth}
+        \tableofcontents
+    \end{minipage}
 \end{frame}
 %============================================%
 
@@ -411,23 +416,6 @@
 %============================================%
 
 %============================================%
-\section{Throwing in a destructor}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\begin{frame}[fragile]{\insertsectionhead: Is it still bad practice?}
-    \begin{itemize}
-        \item It has been considered bad practice for years\\
-              \then \URL[ALERT]{http://www.gotw.ca/gotw/047.htm}{Blog from Herb Sutter (2009)}
-        \item \CPP|bool std::uncaught_exception()|\\
-              detects only if the current thread has a live exception object\\
-              \then it fails to cover all use cases! \Remark{Deprecated in C++17, removed in C++20}
-        \item C++17 introduces \CPP|int std::uncaught_exceptions()|\\
-              that says how many uncaught exceptions exist\\
-              \then see \URL[PB]{https://stackoverflow.com/a/49503194/14967071}{this SO answer} for a nice example
-    \end{itemize}
-\end{frame}
-%============================================%
-
-%============================================%
 \section{Mandatory elision of copy/move operations}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}{\insertsectionhead}
@@ -441,7 +429,7 @@
         Even if the copy/move constructor is not called, it still must be present and accessible, otherwise the program is ill-formed!
     \end{varblock}
     \PrepareURLsymbol[PB]
-    \FrameRemark{$^{\star}$ \textbf{often} $\equiv$ when the operand or initializer expression is a \URL*{https://en.cppreference.com/w/cpp/language/value_category}{prvalue} of the same class type (ignoring cv-qualification).}
+    \FrameRemark{$^{\star}$ \textbf{often} $\equiv$ when the operand or initializer expression is a \URL*{https://stackoverflow.com/q/3601602/14967071}{prvalue} of the same class type (ignoring cv-qualification).}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 \begin{frame}[fragile]{}

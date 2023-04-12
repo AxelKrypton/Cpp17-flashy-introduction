@@ -1,4 +1,6 @@
-#if 0
+#define BASIC_USAGE_3
+
+#ifdef BASIC_USAGE_0
 
 #include <variant>
 #include <string>
@@ -25,7 +27,7 @@ int main()
     //std::get<3>(v);      // valid index values are 0 and 1
 }
 
-#endif
+#elifdef BASIC_USAGE_1
 
 #include <variant>
 #include <iostream>
@@ -47,3 +49,25 @@ int main()
         std::cout << ex.what() << '\n';
     }
 }
+
+#elifdef BASIC_USAGE_3
+
+#include <variant>
+#include <iostream>
+#include <vector>
+
+using var_t = std::variant<int, long, double, std::string>;
+
+int main()
+{
+    std::vector<var_t> vec = {10, 15l, 1.6, "hello"};
+    for (auto& v: vec) {
+        // value-returning visitor, returning another variant
+        var_t w = std::visit([](auto&& arg) -> var_t {return arg + arg;}, v);
+        // void visitor, only called for side-effects
+        std::visit([](auto&& arg){std::cout << arg << " ";}, w);
+    }
+    std::cout << '\n';
+}
+
+#endif
