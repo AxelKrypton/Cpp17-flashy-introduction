@@ -35,6 +35,11 @@
     \newcommand{\emoji}[1]{\;\raisebox{-0.15\textsize}{\includegraphics[height=\f@size pt]{#1}}}
 \makeatother
 \newcommand{\then}{\raisebox{2pt}{$\;\drsh\;$}}
+\newcommand{\Then}[1]{%
+    \pgfmathwidth{"\then"}
+    \pgfmathparse{\linewidth-\pgfmathresult}
+    \then\parbox[t]{\pgfmathresult pt}{\raggedright #1}
+}
 \newcommand{\MakeCoverSlide}{%
     \begin{frame}[plain,noframenumbering]
         \begin{tikzpicture}[remember picture, overlay]
@@ -140,19 +145,32 @@
     \end{frame}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \begin{frame}{C++ standards: A simplistic overview}
-        \begin{description}[<+(1)->]
+        \begin{description}[<+(1)->][C++23XX]
             \item[C++98] First standardization\quad
-            \PB{C++03} Some polishing
+              \PB{C++03} Some polishing
             \item[C++11] \alert{Turning point}\\
-                         \then Move semantics, \CPP|auto|, lambdas, \CPP|constexpr|,\\
-                         \phantom{\then }smart pointers, type-traits, variadic templates, etc.
+                         \Then{
+                             \small
+                             Move semantics, \CPP|auto|, lambdas, \CPP|constexpr|,\\
+                             smart pointers, type-traits, variadic templates, etc.
+                         }
+
             \item[C++14] Small improvements\\
-                         \then {better lambdas and better \CPP|constexpr|,\\
-                         \phantom{\then }return type deduction, variable templates, etc.}
+                         \Then{
+                             \small
+                             Better lambdas and better \CPP|constexpr|,\\
+                             return type deduction, variable templates, etc.
+                         }
+
             \item[C++17] \PS{Larger improvements $\;\to\;$ this talk!}
             \item[C++20] \alert{Turning point}\\
-                         \then Concepts, modules, coroutines, ranges, etc.
-            \item[C++23] Small improvements $\;\to\;$ mdspan, expected, print, etc.
+                         \Then{\small Concepts, modules, coroutines, ranges, etc.}
+            \item[C++23] Small improvements\\
+                         \Then{
+                             \small
+                             Explicit object parameter (deducing \CPP|this|),\\
+                             \CPP|std::mdspan|, \CPP|std::expected|, \CPP|std::print|, etc.
+                         }
         \end{description}
     \end{frame}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
