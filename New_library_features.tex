@@ -182,8 +182,11 @@
                     var_t w = std::visit([](auto&& arg) -> var_t {
                                              return arg + arg;
                                          }, v);
+
                     // void visitor, only called for side-effects
-                    std::visit([](auto&& arg){std::cout << arg;}, w);
+                    std::visit([](auto&& arg){
+                                   std::cout << arg << " ";
+                               }, w);
                 }
             }
         \end{Cpp}
