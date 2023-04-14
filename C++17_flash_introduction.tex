@@ -88,6 +88,23 @@
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \MakeCoverSlide
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+    \begin{frame}{My main expertise for the CRC-TR\,211}{\{\,in terms of programming languages\,\}}
+        \begin{tikzpicture}[every node/.style={circle, very thick, draw}, node distance=2mm]
+            \node[PS, minimum size=30mm, visible on=<1>] (bash) {Bash};
+            \node[PP, minimum size=27mm, right = of bash, alt=<1>{fill=none}{fill=PB!10, fill on=<2>}] (cpp) {C++};
+            \begin{scope}[scope on=<1>]
+                \node[PT, minimum size=23mm, right = of cpp, yshift=11.5mm] (latex) {LaTeX};
+                \node[PB, minimum size=23mm, right = of latex] (git) {Git};
+                \node[PQ, minimum size=15mm, below = of $(latex.south)!0.5!(git.south)$ ] (python) {Python};
+            \end{scope}
+            \node[PB, draw=none, right = of cpp, visible on=<2>, text width=3cm, align=center]{Today we want to explore some modern features!};
+        \end{tikzpicture}
+        \begin{varblock}{alert}[0.9\textwidth]{Let's have a chat}
+            Clean code as common aspect orthogonal to any language!\\
+            Come and torture me with all your nagging questions!
+        \end{varblock}
+    \end{frame}
+    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \begin{frame}[fragile]{Kick-off riddle: Does this code compile?}{\uncover<2->{An (ab)use of the language}}
         \begin{columns}
             \begin{column}{0.58\textwidth}
@@ -125,23 +142,6 @@
                 }
             \end{center}
         \end{uncoverenv}
-    \end{frame}
-    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-    \begin{frame}{My main expertise for the CRC-TR\,211}{\{\,in terms of programming languages\,\}}
-        \begin{tikzpicture}[every node/.style={circle, very thick, draw}, node distance=2mm]
-            \node[PS, minimum size=30mm, visible on=<1>] (bash) {Bash};
-            \node[PP, minimum size=27mm, right = of bash, alt=<1>{fill=none}{fill=PB!10, fill on=<2>}] (cpp) {C++};
-            \begin{scope}[scope on=<1>]
-                \node[PT, minimum size=23mm, right = of cpp, yshift=11.5mm] (latex) {LaTeX};
-                \node[PB, minimum size=23mm, right = of latex] (git) {Git};
-                \node[PQ, minimum size=15mm, below = of $(latex.south)!0.5!(git.south)$ ] (python) {Python};
-            \end{scope}
-            \node[PB, draw=none, right = of cpp, visible on=<2>, text width=3cm, align=center]{Today we want to explore some modern features!};
-        \end{tikzpicture}
-        \begin{varblock}{alert}[0.9\textwidth]{Let's have a chat}
-            Clean code as common aspect orthogonal to any language!\\
-            Come and torture me with all your nagging questions!
-        \end{varblock}
     \end{frame}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \begin{frame}{C++ standards: A simplistic overview}
