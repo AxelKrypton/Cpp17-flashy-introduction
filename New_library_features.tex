@@ -16,13 +16,18 @@
     \end{tabular}
 \end{frame}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\begin{frame}{C++17 new library features I will cover}
+\AddLinkToTOCfalse
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\begin{frame}[label=tocII]{C++17 new library features I will cover}
     \vspace{-3mm}
     \hspace*{1cm}
     \begin{minipage}[t][0.65\textheight]{\textwidth}
         \tableofcontents
     \end{minipage}
 \end{frame}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\def\labelTOC{tocII}
+\AddLinkToTOCtrue
 %============================================%
 
 %============================================%
@@ -127,15 +132,15 @@
                 w = std::get<0>(v); // same effect as the previous line
                 w = v;              // same effect as the previous line
 
-                std::variant<std::string, float> v{
+                std::variant<std::string, float> v2{
                     std::in_place_type<std::string>, 4, 'A'};
                 // initializes 1st alternative with std::string{4, 'A'};
-                assert(v.index() == 0);
-                std::cout << "v=" << std::get<std::string>(v) << '\n';
+                assert(v2.index() == 0);
+                std::cout << "v2=" << std::get<std::string>(v2) << '\n';
             }
         \end{Cpp}
         \begin{Bash}[numbers=none]
-            |+v=AAAA+|
+            |+v2=AAAA+|
         \end{Bash}
     \end{varblock}
     \begin{varblock}{example}[\textwidth]{Basic usage (\overlaynumber)}<only@2>
@@ -177,14 +182,14 @@
             int main()
             {
                 std::vector<var_t> vec = {10, 15l, 1.6, "hello"};
-                for (auto& v: vec) {
+                for (const auto& v: vec) {
                     // value-returning visitor, returning another variant
-                    var_t w = std::visit([](auto&& arg) -> var_t {
+                    var_t w = std::visit([](const auto& arg) -> var_t {
                                              return arg + arg;
                                          }, v);
 
                     // void visitor, only called for side-effects
-                    std::visit([](auto&& arg){
+                    std::visit([](const auto& arg){
                                    std::cout << arg << " ";
                                }, w);
                 }

@@ -14,10 +14,27 @@
 ]
 \graphicspath{{Figures/}}
 
+% Compile with or without links to TOC
+\newif\ifAddLinkToTOC
+\AddLinkToTOCfalse
+\def\labelTOC{toc}
+
 \mode<presentation>
 {
     \usetheme{Z02}
     \setbeamersize{text margin left=8mm, text margin left=8mm}
+    %Add a link to table of content on frames with a footline
+    \addtobeamertemplate{footline}{}{%
+        \ifAddLinkToTOC%
+            \begin{tikzpicture}[remember picture,overlay]
+                %xelatex needs \XeTeXLinkBox, won't create a link unless it
+                %finds text --- rules don't work without \XeTeXLinkBox.
+                %Still builds correctly with pdflatex and lualatex
+                \node[anchor=south east, inner sep=2pt] at (current page.south east)
+                    {\hyperlink{\labelTOC}{\XeTeXLinkBox{\includegraphics[width=3mm]{TOC}}}};
+            \end{tikzpicture}%
+        \fi%
+    }%
 }
 
 \usetikzlibrary{
@@ -34,12 +51,6 @@
     \setlength{\textsize}{\f@size pt}
     \newcommand{\emoji}[1]{\;\raisebox{-0.15\textsize}{\includegraphics[height=\f@size pt]{#1}}}
 \makeatother
-\newcommand{\then}{\raisebox{2pt}{$\;\drsh\;$}}
-\newcommand{\Then}[1]{%
-    \pgfmathwidth{"\then"}
-    \pgfmathparse{\linewidth-\pgfmathresult}
-    \then\parbox[t]{\pgfmathresult pt}{\raggedright #1}
-}
 \newcommand{\MakeCoverSlide}{%
     \begin{frame}[plain,noframenumbering]
         \begin{tikzpicture}[remember picture, overlay]
@@ -84,7 +95,7 @@
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \title{A flashy introduction to}
     \author{Alessandro~Sciarra}
-    \date{14 April 2023}
+    \date{24 February 2025}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \MakeCoverSlide
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
@@ -199,10 +210,12 @@
     \end{frame}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \label{P1}
+    \AddLinkToTOCfalse
     \part{New language features}
     \input{New_language_features}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
     \label{P2}
+    \AddLinkToTOCfalse
     \part{New library features}
     \input{New_library_features}
     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
